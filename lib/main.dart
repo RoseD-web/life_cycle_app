@@ -69,12 +69,12 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
     });
   }
 
-  void plusLabel5() {
-    label += 5;
-  }
-
-  void plusLabel2() {
-    label += 2;
+  void incrementLabel10() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      label = (prefs.getInt('counter') ?? 0) + 10;
+      prefs.setInt('counter', label);
+    });
   }
 
   void minusLabel(int a) {
@@ -123,28 +123,41 @@ class _MainState extends State<Main> with WidgetsBindingObserver {
         child: Center(
           child: Container(
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(label.toDouble()),
-                color: Colors.yellow),
+              borderRadius: BorderRadius.circular(label.toDouble()),
+              color: Colors.yellow,
+            ),
             height: 325,
             width: 325,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(label.toString()),
-                FloatingActionButton.large(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/update_counter')
-                        .then((flag) {
-                      if (flag != null) {
-                        // you're back from PageB, perform your function here
-                        setState(
-                            () {}); // you may need to call this if you want to update UI
-                      }
-                    });
-                  },
-                  backgroundColor: Colors.blue,
-                  child: Text('Tap'),
-                )
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: FloatingActionButton.large(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UpdateCounter(
+                                incrementCallback: incrementLabel10,
+                              ),
+                            ),
+                          ).then((flag) {
+                            if (flag != null) {
+                              setState(() {});
+                            }
+                          });
+                        },
+                        backgroundColor: Colors.blue,
+                        child: Text('Tap'),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
